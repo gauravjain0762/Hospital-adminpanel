@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-geist: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #0f0f0f;
+  color: #f5f5f5;
+  font-family: var(--font-geist);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
+}
+
+/* Scrollbar thin utility */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 3px;
+}
+
+/* Selection */
+::selection {
+  background-color: rgba(229, 62, 62, 0.25);
+  color: #f5f5f5;
+}
+
+/* Recharts overrides */
+.recharts-tooltip-wrapper {
+  outline: none !important;
+}
+.recharts-default-tooltip {
+  background-color: #1f1f1f !important;
+  border: 1px solid #2a2a2a !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+}
+.recharts-tooltip-label {
+  color: #a0a0a0 !important;
+  font-size: 12px !important;
+}
+.recharts-tooltip-item {
+  color: #f5f5f5 !important;
+  font-size: 13px !important;
+}
+.recharts-cartesian-axis-tick-value {
+  fill: #606060 !important;
+  font-size: 11px !important;
+}
+.recharts-cartesian-grid line {
+  stroke: #1f1f1f !important;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}

@@ -1,0 +1,153 @@
+﻿"use client";
+import { useState, useEffect } from "react";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { Save } from "lucide-react";
+
+const BASE_URL = "https://hospital-saas-backend.onrender.com";
+const getAdminToken = () =>
+  localStorage.getItem("token") || localStorage.getItem("pulse_admin_token") || "";
+
+const ENDPOINTS: Record<"doctor" | "patient", string> = {
+  doctor: "/api/admin/legal/terms_doctor",
+  patient: "/api/admin/legal/terms_patient",
+};
+
+export default function TermsPage() {
+  const [activeTab, setActiveTab] = useState<"doctor" | "patient">("doctor");
+  const [contents, setContents] = useState<Record<"doctor" | "patient", string>>({
+    doctor: "",
+    patient: "",
+  });
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
+  const [loadingContent, setLoadingContent] = useState(true);
+
+  useEffect(() => {
+    const fetchAll = async () => {
+      setLoadingContent(true);
+      try {
+        const token = getAdminToken();
+        const [doctorRes, patientRes] = await Promise.all([
+          fetch(`${BASE_URL}${ENDPOINTS.doctor}`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${BASE_URL}${ENDPOINTS.patient}`, { headers: { Authorization: `Bearer ${token}` } }),
+        ]);
+        const [doctorData, patientData] = await Promise.all([doctorRes.json(), patientRes.json()]);
+        setContents({
+          doctor: doctorData.content ?? doctorData.data?.content ?? "",
+          patient: patientData.content ?? patientData.data?.content ?? "",
+        });
+      } catch {
+        // silently fail — user can still type and save
+      } finally {
+        setLoadingContent(false);
+      }
+    };
+    fetchAll();
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    setError("");
+    try {
+      const res = await fetch(`${BASE_URL}${ENDPOINTS[activeTab]}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getAdminToken()}`,
+        },
+        body: JSON.stringify({ content: contents[activeTab] }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to save");
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <DashboardLayout>
+      <div className="animate-fade-in">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-white">Terms &amp; Conditions</h1>
+            <p className="text-text-secondary text-sm mt-1">
+              Set terms and conditions for doctors and patients shown in the mobile app.
+            </p>
+          </div>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="h-9 px-4 rounded-lg bg-accent-red hover:bg-red-600 disabled:opacity-50 text-white text-sm font-medium flex items-center gap-2 transition-colors"
+          >
+            {saving ? (
+              <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+              </svg>
+            ) : (
+              <Save size={14} />
+            )}
+            {saving ? "Saving..." : saved ? "Saved!" : "Save"}
+          </button>
+        </div>
+
+        {error && (
+          <div className="mb-4 px-4 py-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+            {error}
+          </div>
+        )}
+
+        {/* Tabs */}
+        <div className="flex gap-1 mb-5 bg-bg-card border border-border-subtle rounded-xl p-1 w-fit">
+          {(["doctor", "patient"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
+                activeTab === tab
+                  ? "bg-accent-red text-white shadow"
+                  : "text-text-muted hover:text-text-primary"
+              }`}
+            >
+              {tab === "doctor" ? "Doctors" : "Patients"}
+            </button>
+          ))}
+        </div>
+
+        <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-border-subtle">
+            <p className="text-text-muted text-xs uppercase tracking-wider">
+              Terms &amp; Conditions for {activeTab === "doctor" ? "Doctors" : "Patients"}
+            </p>
+            <p className="text-text-muted text-xs">{contents[activeTab].length} characters</p>
+          </div>
+          {loadingContent ? (
+            <div className="flex items-center justify-center h-40 text-text-muted text-sm">
+              <svg className="animate-spin w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+              </svg>
+              Loading content...
+            </div>
+          ) : (
+            <textarea
+              key={activeTab}
+              value={contents[activeTab]}
+              onChange={(e) =>
+                setContents((p) => ({ ...p, [activeTab]: e.target.value }))
+              }
+              placeholder={`Enter Terms & Conditions for ${activeTab === "doctor" ? "doctors" : "patients"}...`}
+              rows={26}
+              className="w-full bg-transparent px-5 py-4 text-text-primary text-sm leading-relaxed resize-none focus:outline-none placeholder:text-text-muted"
+            />
+          )}
+        </div>
+      </div>
+    </DashboardLayout>
+  );
+}
