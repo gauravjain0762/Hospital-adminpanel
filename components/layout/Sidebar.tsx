@@ -20,7 +20,7 @@ const navItems = [
   { label: "Appointments", href: "/appointments", icon: Calendar },
   // { label: "Queue", href: "/queue", icon: ListOrdered },
   // { label: "Verification", href: "/verification", icon: ShieldCheck },
-  { label: "Payments", href: "/payments", icon: CreditCard },
+  { label: "Revenue", href: "/payments", icon: CreditCard },
   // { label: "Reviews", href: "/reviews", icon: Star },
   // { label: "Notifications", href: "/notifications", icon: Bell },
   { label: "Support", href: "/support", icon: HeadphonesIcon },
