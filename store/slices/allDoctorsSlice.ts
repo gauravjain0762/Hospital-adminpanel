@@ -4,57 +4,67 @@ const BASE_URL = "https://hospital-saas-backend.onrender.com";
 const getAdminToken = () =>
   localStorage.getItem("token") || localStorage.getItem("pulse_admin_token") || "";
 
-// FETCH ALL DOCTORS (server-side pagination)
+const mapUser = (user: any) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  phone: user.phone,
+  initials: user.name?.charAt(0),
+  specialization: user.services?.[0] || "General",
+  clinic: user.clinic?.clinicName || "N/A",
+  status: user.activeStatus || "inactive",
+  verificationStatus: user.status,
+  rating: user.clinic?.rating || 0,
+  totalAppointments: user.totalAppointments || 0,
+  profilePhoto: user.profilePhoto || "",
+  createdAt: user.createdAt || "",
+  updatedAt: user.updatedAt || "",
+  fullData: user,
+});
+
+const sortByDate = (a: any, b: any): number => {
+  const getTime = (item: any): number => {
+    if (item.createdAt) {
+      const t = new Date(item.createdAt).getTime();
+      if (!isNaN(t)) return t;
+    }
+    if (typeof item.id === "string" && item.id.length >= 8) {
+      return parseInt(item.id.substring(0, 8), 16) * 1000;
+    }
+    return 0;
+  };
+  return getTime(b) - getTime(a);
+};
+
+// FETCH ALL DOCTORS — fetches every backend page then sorts newest-first for client-side pagination
 export const fetchAllDoctors = createAsyncThunk(
   "allDoctors/fetch",
-  async (page: number = 1, { rejectWithValue }) => {
+  async (_page: number = 1, { rejectWithValue }) => {
     try {
       const token = getAdminToken();
-      const res = await fetch(`${BASE_URL}/api/admin/all-users?page=${page}`, {
+      const res1 = await fetch(`${BASE_URL}/api/admin/all-users?page=1`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
+      const data1 = await res1.json();
+      if (!res1.ok) throw new Error(data1.message);
 
-      const users = data.users
-        .map((user: any) => ({
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          initials: user.name?.charAt(0),
-          specialization: user.services?.[0] || "General",
-          clinic: user.clinic?.clinicName || "N/A",
-          status: user.activeStatus || "inactive",
-          verificationStatus: user.status,
-          rating: user.clinic?.rating || 0,
-          totalAppointments: user.totalAppointments || 0,
-          profilePhoto: user.profilePhoto || "",
-          createdAt: user.createdAt || "",
-          updatedAt: user.updatedAt || "",
-          fullData: user,
-        }))
-        .sort((a: any, b: any) => {
-          const getTime = (item: any): number => {
-            if (item.createdAt) {
-              const t = new Date(item.createdAt).getTime();
-              if (!isNaN(t)) return t;
-            }
-            if (typeof item.id === "string" && item.id.length >= 8) {
-              return parseInt(item.id.substring(0, 8), 16) * 1000;
-            }
-            return 0;
-          };
-          return getTime(b) - getTime(a);
-        });
+      const totalPages: number = data1.totalPages ?? 1;
+      const total: number = data1.total ?? data1.users.length;
+      let allRaw: any[] = [...data1.users];
 
-      const total = data.total ?? users.length;
-      return {
-        users,
-        total,
-        page: data.page ?? page,
-        totalPages: data.totalPages ?? (Math.ceil(total / 10) || 1),
-      };
+      if (totalPages > 1) {
+        const rest = await Promise.all(
+          Array.from({ length: totalPages - 1 }, (_, i) =>
+            fetch(`${BASE_URL}/api/admin/all-users?page=${i + 2}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            }).then((r) => r.json())
+          )
+        );
+        for (const d of rest) if (d.users) allRaw = allRaw.concat(d.users);
+      }
+
+      const users = allRaw.map(mapUser).sort(sortByDate);
+      return { users, total, page: 1, totalPages };
     } catch (err: any) {
       return rejectWithValue(err.message);
     }

@@ -105,8 +105,6 @@ const handleSelectOne = (id: string) => {
   }, [list]);
 
   const filteredTotal = filtered.length;
-  const filteredTotalPages = Math.ceil(filteredTotal / pagination.limit) || 1;
-
   const paginated = filtered.slice(
     (pagination.page - 1) * pagination.limit,
     pagination.page * pagination.limit
@@ -291,7 +289,7 @@ const handleSelectOne = (id: string) => {
             <div className="flex items-center justify-between px-4 py-3 border-t border-border-subtle">
               <p className="text-text-muted text-xs">
                 Page <span className="text-text-primary font-medium">{pagination.page}</span> of{" "}
-                <span className="text-text-primary font-medium">{filteredTotalPages}</span>{" "}
+                <span className="text-text-primary font-medium">{Math.ceil(filteredTotal / pagination.limit) || 1}</span>{" "}
                 &mdash; <span className="text-text-primary font-medium">{filteredTotal}</span> total
               </p>
               <Pagination

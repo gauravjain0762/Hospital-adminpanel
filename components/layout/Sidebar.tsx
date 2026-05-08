@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { toggleSidebar } from "@/store/slices/uiSlice";
 import { cn } from "@/lib/utils";
@@ -33,6 +33,7 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const collapsed = useAppSelector((s) => s.ui.sidebarCollapsed);
@@ -119,7 +120,7 @@ export default function Sidebar() {
                       href="/dashboard/doctors?status=active"
                       className={cn(
                         "block px-3 py-1.5 text-sm rounded-md",
-                        pathname === "/dashboard/doctors" && new URLSearchParams(typeof window !== "undefined" ? window.location.search : "").get("status") === "active"
+                        pathname === "/dashboard/doctors" && searchParams.get("status") === "active"
                           ? "text-accent-red"
                           : "text-text-muted hover:text-text-primary"
                       )}
@@ -131,7 +132,7 @@ export default function Sidebar() {
                       href="/dashboard/doctors?status=inactive"
                       className={cn(
                         "block px-3 py-1.5 text-sm rounded-md",
-                        pathname === "/dashboard/doctors" && new URLSearchParams(typeof window !== "undefined" ? window.location.search : "").get("status") === "inactive"
+                        pathname === "/dashboard/doctors" && searchParams.get("status") === "inactive"
                           ? "text-accent-red"
                           : "text-text-muted hover:text-text-primary"
                       )}
