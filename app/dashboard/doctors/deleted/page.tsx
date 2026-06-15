@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui";
 import { X, Trash2, MapPin, Phone, Mail, Calendar, CheckCircle, History, UserX, ShieldAlert } from "lucide-react";
 
-const BASE_URL = "https://staging-api.queuetoken.in";
+const BASE_URL = "https://api.queuetoken.in";
 const getAdminToken = () =>
   localStorage.getItem("token") || localStorage.getItem("pulse_admin_token") || "";
 
@@ -133,7 +133,7 @@ export default function DeleteRequestsPage() {
       key: "clinic",
       label: "Clinic",
       render: (d: any) => (
-        <span className="text-text-primary text-sm">{d.clinic || "—"}</span>
+        <span className="text-text-primary text-sm">{d.clinic || "â€”"}</span>
       ),
     },
     {
@@ -156,7 +156,7 @@ export default function DeleteRequestsPage() {
       key: "reason",
       label: "Reason",
       render: (d: any) => (
-        <span className="text-text-muted text-xs">{d.reason || "—"}</span>
+        <span className="text-text-muted text-xs">{d.reason || "â€”"}</span>
       ),
     },
     {
@@ -168,7 +168,7 @@ export default function DeleteRequestsPage() {
             ? new Date(d.deletedAt).toLocaleDateString("en-IN", {
                 day: "2-digit", month: "short", year: "numeric",
               })
-            : "—"}
+            : "â€”"}
         </span>
       ),
     },
@@ -194,21 +194,21 @@ export default function DeleteRequestsPage() {
       key: "clinic",
       label: "Clinic",
       render: (d: any) => (
-        <span className="text-text-primary text-sm">{d.clinic || "—"}</span>
+        <span className="text-text-primary text-sm">{d.clinic || "â€”"}</span>
       ),
     },
     {
       key: "phone",
       label: "Phone",
       render: (d: any) => (
-        <span className="text-text-secondary text-sm">{d.phone || "—"}</span>
+        <span className="text-text-secondary text-sm">{d.phone || "â€”"}</span>
       ),
     },
     {
       key: "city",
       label: "City",
       render: (d: any) => (
-        <span className="text-text-secondary text-sm">{d.city || "—"}</span>
+        <span className="text-text-secondary text-sm">{d.city || "â€”"}</span>
       ),
     },
     {
@@ -225,7 +225,7 @@ export default function DeleteRequestsPage() {
             ? new Date(d.requestedAt).toLocaleDateString("en-IN", {
                 day: "2-digit", month: "short", year: "numeric",
               })
-            : "—"}
+            : "â€”"}
         </span>
       ),
     },
@@ -399,11 +399,11 @@ export default function DeleteRequestsPage() {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm">
                 <Mail size={14} className="text-text-muted shrink-0" />
-                <span className="text-text-secondary">{selectedDoctor.email || "—"}</span>
+                <span className="text-text-secondary">{selectedDoctor.email || "â€”"}</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Phone size={14} className="text-text-muted shrink-0" />
-                <span className="text-text-secondary">{selectedDoctor.phone || "—"}</span>
+                <span className="text-text-secondary">{selectedDoctor.phone || "â€”"}</span>
               </div>
               {selectedDoctor.city && (
                 <div className="flex items-center gap-2 text-sm">
@@ -420,7 +420,7 @@ export default function DeleteRequestsPage() {
                         day: "2-digit", month: "short", year: "numeric",
                         hour: "2-digit", minute: "2-digit",
                       })
-                    : "—"}
+                    : "â€”"}
                 </span>
               </div>
             </div>
@@ -509,3 +509,4 @@ export default function DeleteRequestsPage() {
     </DashboardLayout>
   );
 }
+

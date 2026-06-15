@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -33,7 +33,7 @@ export default function LoginPage() {
     setError("");
     try {
       const res = await fetch(
-        "https://staging-api.queuetoken.in/api/auth/admin-login",
+        "https://api.queuetoken.in/api/auth/admin-login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -55,7 +55,7 @@ export default function LoginPage() {
 
   return (
     <div className={`min-h-screen flex ${d ? "bg-[#0a0a0a]" : "bg-[#f5f5f5]"}`}>
-      {/* Left panel — branding */}
+      {/* Left panel â€” branding */}
       <div
         className={`hidden lg:flex flex-col justify-between w-[45%] border-r p-10 ${
           d ? "bg-[#0f0f0f] border-[#1f1f1f]" : "bg-white border-[#e5e5e5]"
@@ -97,10 +97,10 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className={`text-xs ${d ? "text-[#444]" : "text-[#bbb]"}`}>© 2026 Queue Token</p>
+        <p className={`text-xs ${d ? "text-[#444]" : "text-[#bbb]"}`}>Â© 2026 Queue Token</p>
       </div>
 
-      {/* Right panel — login form */}
+      {/* Right panel â€” login form */}
       <div className="flex-1 flex items-center justify-center p-6 relative">
         {/* Theme toggle */}
         <button
@@ -175,7 +175,7 @@ export default function LoginPage() {
                 <Lock size={15} className={`absolute left-3.5 top-1/2 -translate-y-1/2 ${d ? "text-[#555]" : "text-[#aaa]"}`} />
                 <input
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleLogin()}
@@ -216,10 +216,11 @@ export default function LoginPage() {
           </div>
 
           <p className={`text-center text-xs mt-8 ${d ? "text-[#444]" : "text-[#bbb]"}`}>
-            Admin Panel · v1.0
+            Admin Panel Â· v1.0
           </p>
         </div>
       </div>
     </div>
   );
 }
+

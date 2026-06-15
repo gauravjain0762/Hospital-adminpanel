@@ -10,7 +10,6 @@ import {
   CalendarCheck,
   Stethoscope,
   Search,
-  CheckCircle2,
   Zap,
   LayoutGrid,
   Users,
@@ -73,49 +72,6 @@ function PlanBadge({ plan }: { plan: PlanType }) {
     </span>
   );
 }
-
-// ─── Plan config ──────────────────────────────────────────────────────────────
-
-const PLANS = [
-  {
-    id: "token" as PlanType,
-    name: "Token Plan",
-    icon: <Zap size={22} />,
-    tagline: "Pay per appointment, fully flexible",
-    price: "Per Token",
-    priceNote: "Billed based on appointments generated",
-    color: "purple",
-    borderClass: "border-purple-500/30",
-    bgClass: "bg-purple-500/5",
-    iconBg: "bg-purple-500/15 text-purple-400",
-    features: [
-      "Charged per appointment token",
-      "No monthly commitment",
-      "Ideal for new or part-time doctors",
-      "Usage-based billing",
-      "Full platform access",
-    ],
-  },
-  {
-    id: "monthly" as PlanType,
-    name: "Monthly Plan",
-    icon: <LayoutGrid size={22} />,
-    tagline: "Fixed monthly fee, unlimited tokens",
-    price: "Monthly",
-    priceNote: "Flat fee billed every month",
-    color: "blue",
-    borderClass: "border-blue-500/30",
-    bgClass: "bg-blue-500/5",
-    iconBg: "bg-blue-500/15 text-blue-400",
-    features: [
-      "Unlimited appointment tokens",
-      "Predictable monthly billing",
-      "Ideal for high-volume doctors",
-      "Priority support",
-      "Full platform access",
-    ],
-  },
-];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -182,54 +138,6 @@ export default function PaymentsPage() {
           <p className="text-text-secondary text-sm mt-1">
             Manage doctor subscription plans and track platform revenue.
           </p>
-        </div>
-
-        {/* ── Plan Cards ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {PLANS.map((plan) => (
-            <div
-              key={plan.id}
-              className={`rounded-2xl border ${plan.borderClass} ${plan.bgClass} p-6 flex flex-col gap-5`}
-            >
-              {/* Plan header */}
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${plan.iconBg}`}>
-                    {plan.icon}
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-bold text-white">{plan.name}</h2>
-                    <p className="text-text-muted text-xs mt-0.5">{plan.tagline}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-white font-semibold text-sm">{plan.price}</p>
-                  <p className="text-text-muted text-xs mt-0.5">{plan.priceNote}</p>
-                </div>
-              </div>
-
-              {/* Features */}
-              <ul className="space-y-2">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-text-secondary">
-                    <CheckCircle2 size={14} className={plan.color === "purple" ? "text-purple-400" : "text-blue-400"} />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-
-              {/* Doctor count */}
-              <div className={`flex items-center gap-2 pt-4 border-t ${plan.color === "purple" ? "border-purple-500/20" : "border-blue-500/20"}`}>
-                <Users size={14} className="text-text-muted" />
-                <span className="text-text-muted text-sm">
-                  <span className="text-white font-semibold">
-                    {plan.id === "token" ? tokenCount : monthlyCount}
-                  </span>{" "}
-                  doctors on this plan
-                </span>
-              </div>
-            </div>
-          ))}
         </div>
 
         {/* ── Summary Stats ── */}
