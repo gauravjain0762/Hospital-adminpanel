@@ -22,8 +22,8 @@ export default function LoginPage() {
     localStorage.setItem("theme", next ? "dark" : "light");
   };
 
-  const [email, setEmail] = useState("admin@saas.com");
-  const [password, setPassword] = useState("Admin@123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchPendingDoctors } from "@/store/slices/pendingDoctorsSlice";
 import { fetchAllDoctors } from "@/store/slices/allDoctorsSlice";
 import { fetchDoctorAnalytics, clearAnalytics, FilterType } from "@/store/slices/doctorAnalyticsSlice";
@@ -11,6 +11,7 @@ import PatientsTab from "@/components/PatientsTab";
 import { DatePickerInput } from "@/components/ui";
 import { FaFilePdf, FaImage } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { QRCodeCanvas } from "qrcode.react";
 
 type PreviewModalProps = {
   fileUrl: string;
@@ -243,6 +244,48 @@ const getFileName = (label: string) => {
   const [activeTab, setActiveTab] = useState("analytics");
   const [showAvailability, setShowAvailability] = useState(false);
   const [previewFile, setPreviewFile] = useState<string | null>(null);
+  const [qrType, setQrType] = useState<"mobile" | "web" | null>(null);
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  const getQrValue = (type: "mobile" | "web", clinicId: string, clinicName?: string) =>
+    type === "mobile"
+      ? JSON.stringify({ id: clinicId, clinicName: clinicName || "" })
+      : `https://www.queuetoken.in/c/${clinicId}`;
+
+  const handleQrDownload = (type: "mobile" | "web", clinicId: string) => {
+    const canvas = qrCanvasRef.current;
+    if (!canvas) return;
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = `${type}-qr-${clinicId}.png`;
+    link.click();
+  };
+
+  const handleQrShare = (type: "mobile" | "web", clinicId: string, clinicName?: string) => {
+    const canvas = qrCanvasRef.current;
+    if (!canvas) return;
+    const value = getQrValue(type, clinicId, clinicName);
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      const file = new File([blob], `${type}-qr-${clinicId}.png`, { type: "image/png" });
+      try {
+        if (navigator.canShare?.({ files: [file] })) {
+          await navigator.share({
+            title: type === "mobile" ? "Mobile QR" : "Web Booking QR",
+            text: value,
+            files: [file],
+          });
+        } else if (navigator.share) {
+          await navigator.share({ title: "QR Code", text: value });
+        } else {
+          await navigator.clipboard.writeText(value);
+          alert("Sharing not supported on this browser — value copied to clipboard instead.");
+        }
+      } catch {
+        // user cancelled share
+      }
+    });
+  };
 
   if (!doctor && (pendingLoading || allLoading || (!pendingList.length && !allList.length))) {
     return (
@@ -300,7 +343,7 @@ const getInitials = (name = "") => {
 
         {/* Tabs */}
         <div className="flex gap-6 border-b border-border-default mb-6">
-          {["analytics", "overview", "Patients"].map((tab) => (
+          {["analytics", "overview", "Patients", "QR Code"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -636,6 +679,67 @@ const getInitials = (name = "") => {
 
 {activeTab === "analytics" && id && (
   <AnalyticsTab doctorId={id} />
+)}
+
+{activeTab === "QR Code" && id && (
+  <div className="space-y-6">
+    <div className="flex gap-4">
+      <button
+        onClick={() => setQrType("mobile")}
+        className={`px-5 py-3 rounded-xl border text-sm font-medium transition-all ${
+          qrType === "mobile"
+            ? "bg-accent-red border-accent-red text-white"
+            : "bg-bg-secondary border-border-default text-text-muted hover:text-text-primary"
+        }`}
+      >
+        📱 Mobile QR
+      </button>
+      <button
+        onClick={() => setQrType("web")}
+        className={`px-5 py-3 rounded-xl border text-sm font-medium transition-all ${
+          qrType === "web"
+            ? "bg-accent-red border-accent-red text-white"
+            : "bg-bg-secondary border-border-default text-text-muted hover:text-text-primary"
+        }`}
+      >
+        💻 Web QR
+      </button>
+    </div>
+
+    {qrType && (
+      <div className="bg-bg-secondary border border-border-default rounded-xl p-6 flex flex-col items-center gap-4 max-w-sm">
+        <h3 className="text-sm font-semibold text-text-primary">
+          {qrType === "mobile" ? "Mobile QR (Clinic ID)" : "Web Booking QR"}
+        </h3>
+        <div className="bg-white p-3 rounded-lg">
+          <QRCodeCanvas
+            key={qrType}
+            ref={qrCanvasRef}
+            value={getQrValue(qrType, data.clinicId, data.clinic?.clinicName)}
+            size={220}
+            level="M"
+          />
+        </div>
+        <p className="text-xs text-text-muted text-center break-all">
+          {getQrValue(qrType, data.clinicId, data.clinic?.clinicName)}
+        </p>
+        <div className="flex gap-3 w-full">
+          <button
+            onClick={() => handleQrDownload(qrType, data.clinicId)}
+            className="flex-1 px-4 py-2 bg-bg-elevated hover:bg-bg-hover border border-border-default text-text-primary text-sm rounded-lg transition"
+          >
+            ⬇ Download
+          </button>
+          <button
+            onClick={() => handleQrShare(qrType, data.clinicId, data.clinic?.clinicName)}
+            className="flex-1 px-4 py-2 bg-accent-red hover:bg-red-700 text-white text-sm rounded-lg transition"
+          >
+            ↗ Share
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
 )}
       </div>
 
