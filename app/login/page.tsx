@@ -153,7 +153,7 @@ export default function LoginPage() {
                 <Mail size={15} className={`absolute left-3.5 top-1/2 -translate-y-1/2 ${d ? "text-[#555]" : "text-[#aaa]"}`} />
                 <input
                   type="email"
-                  placeholder="admin@saas.com"
+                  placeholder="Enter email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleLogin()}
@@ -175,7 +175,7 @@ export default function LoginPage() {
                 <Lock size={15} className={`absolute left-3.5 top-1/2 -translate-y-1/2 ${d ? "text-[#555]" : "text-[#aaa]"}`} />
                 <input
                   type={showPassword ? "text" : "password"}
-                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                  placeholder="Enter Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleLogin()}
